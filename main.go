@@ -101,6 +101,10 @@ func main() {
 		panic(err)
 	}
 
+	mpv(id, episode, english, epNumber)
+}
+
+func mpv(id, episode, english_title string, epNumber int) {
 	sources := listEpisodes(id)
 
 	var gogoAnime int
@@ -112,22 +116,53 @@ func main() {
 	}
 
 	var url string
+	var title string
 	for i := range sources[gogoAnime].Episodes {
 		if sources[gogoAnime].Episodes[i].Number == epNumber {
 			url = watch(sources[gogoAnime].ProviderID, sources[gogoAnime].Episodes[i].ID, episode, id)
+			title = sources[gogoAnime].Episodes[i].Title
 			fmt.Println(url)
 			break
 		}
 	}
 
-	cmdStruct := exec.Command("pwsh.exe", "/c", "mpv", url)
-	out, err := cmdStruct.Output()
+	cmd := exec.Command("pwsh.exe", "/c", "mpv", url)
+	err := cmd.Run()
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(out)
+	var choice string
+	fmt.Printf("\nPlaying: %s | %s\n", english_title, title)
+	fmt.Printf("[n] Next Episode\n")
+	fmt.Printf("[p] Previous Episode\n")
+	fmt.Printf("[s] Select Episode\n")
+	fmt.Printf("[q] Quit\n")
+	fmt.Print("Choose: ")
+	fmt.Scan(&choice)
 
+	if choice == "n" {
+		epNumber++
+		episode = strconv.Itoa(epNumber)
+		mpv(id, episode, english_title, epNumber)
+	}
+	if choice == "p" {
+		epNumber--
+		episode = strconv.Itoa(epNumber)
+		mpv(id, episode, english_title, epNumber)
+	}
+	if choice == "s" {
+		fmt.Print("\nChoose an episode")
+		fmt.Scan(&episode)
+		epNumber, err := strconv.Atoi(episode)
+		if err != nil {
+			panic(err)
+		}
+		mpv(id, episode, english_title, epNumber)
+	}
+	if choice == "q" {
+		os.Exit(0)
+	}
 }
 
 func listEpisodes(anime_id string) WatchResponse {
