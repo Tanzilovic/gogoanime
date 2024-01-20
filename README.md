@@ -1,6 +1,6 @@
 # gogoanime (Not the site)
 
-But a script that lets\* you watch anime via the command line written in Go.
+But a script that lets you watch anime via the command line written in Go.
 
 # Roadmap
 
@@ -15,5 +15,3 @@ But a script that lets\* you watch anime via the command line written in Go.
 
 - [golang](https://go.dev)
 - [mpv](https://community.chocolatey.org/packages/mpv)
-
-\*still wouldn't recommend you download it though :)
