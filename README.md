@@ -2,12 +2,16 @@
 
 But a script that lets\* you watch anime via the command line written in Go.
 
-# Why Go?
+# Roadmap
 
-A couple of weeks ago I gave myself a challenge. I wanted to see if i could learn Go in a timespan of about 2 weeks. I did this to prove to myself that i can do anything i want to if i put my mind to it.
-And this was the outcome. I will be working on this over the next couple of weeks to see if i can work through some of it's _quirks_, but so far so good :)
+## Features of next major version
 
-# Requirements
+- Increased speed by 1.5x (arbitrary number)
+- Can watch all possible episodes of anime without error caused by script
+- Multi-Platform support (minimum: Windows and MacOS)
+- Download Episodes / batch download episodes
+
+# Current requirements
 
 - [golang](https://go.dev)
 - [mpv](https://community.chocolatey.org/packages/mpv)

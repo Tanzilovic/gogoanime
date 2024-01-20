@@ -121,12 +121,11 @@ func mpv(id, episode, english_title string, epNumber int) {
 		if sources[gogoAnime].Episodes[i].Number == epNumber {
 			url = watch(sources[gogoAnime].ProviderID, sources[gogoAnime].Episodes[i].ID, episode, id)
 			title = sources[gogoAnime].Episodes[i].Title
-			fmt.Println(url)
 			break
 		}
 	}
 
-	cmd := exec.Command("pwsh.exe", "/c", "mpv", url)
+	cmd := exec.Command("powershell.exe", "/c", "mpv", url)
 	err := cmd.Run()
 	if err != nil {
 		panic(err)
@@ -188,7 +187,8 @@ func listEpisodes(anime_id string) WatchResponse {
 }
 
 func watch(provider, watchid, episodeNumber, id string) string {
-	res, err := http.Get("https://api.anify.tv/sources?providerId=" + provider + "&watchId=" + watchid + "&episodeNumber=" + episodeNumber + "&id=" + id + "&subType=sub")
+	url := fmt.Sprintf("https://api.anify.tv/sources?providerId=%s&watchId=%s&episodeNumber=%s&id=%s&subType=sub", provider, watchid, episodeNumber, id)
+	res, err := http.Get(url)
 	if err != nil {
 		panic(err)
 	}
