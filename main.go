@@ -123,6 +123,7 @@ func mpv(id, episode, english_title string, epNumber int) {
 		if sources[i].ProviderID == "gogoanime" {
 			gogoAnime = i
 			break
+
 		}
 	}
 
@@ -138,12 +139,16 @@ func mpv(id, episode, english_title string, epNumber int) {
 	}
 
 	if bestUrl != "" {
+		bestUrl = fmt.Sprintf("'%s'", bestUrl)
+		fmt.Println(bestUrl)
 		cmd := exec.Command("powershell.exe", "/c", "mpv", bestUrl)
 		err := cmd.Run()
 		if err != nil {
 			panic(err)
 		}
 	} else {
+		defUrl = fmt.Sprintf("'%s'", defUrl)
+		fmt.Println("Default:", defUrl)
 		cmd := exec.Command("powershell.exe", "/c", "mpv", defUrl)
 		err := cmd.Run()
 		if err != nil {
