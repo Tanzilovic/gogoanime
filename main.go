@@ -41,23 +41,19 @@ type Links struct {
 	} `json:"sources"`
 }
 
-func qualityCheck(link Links, quality, backup string) (string, string, string) {
+func (link *Links) qualityCheck(quality string) (string, string) {
 	var def string
-	var second string
 	var best string
 	for i := range link.Sources {
 		if link.Sources[i].Quality == quality {
 			best = link.Sources[i].Url
-		}
-		if link.Sources[i].Quality == backup {
-			second = link.Sources[i].Url
 		}
 		if link.Sources[i].Quality == "default" {
 			def = link.Sources[i].Url
 		}
 	}
 
-	return def, best, second
+	return best, def
 }
 
 func main() {
@@ -131,12 +127,11 @@ func mpv(id, episode, english_title string, epNumber int) {
 	}
 
 	var bestUrl string
-	var secondUrl string
 	var defUrl string
 	var title string
 	for i := range sources[gogoAnime].Episodes {
 		if sources[gogoAnime].Episodes[i].Number == epNumber {
-			bestUrl, secondUrl, defUrl = watch(sources[gogoAnime].ProviderID, sources[gogoAnime].Episodes[i].ID, episode, id)
+			bestUrl, defUrl = watch(sources[gogoAnime].ProviderID, sources[gogoAnime].Episodes[i].ID, episode, id)
 			title = sources[gogoAnime].Episodes[i].Title
 			break
 		}
@@ -148,13 +143,7 @@ func mpv(id, episode, english_title string, epNumber int) {
 		if err != nil {
 			panic(err)
 		}
-	} else if secondUrl != "" {
-		cmd := exec.Command("powershell.exe", "/c", "mpv", secondUrl)
-		err := cmd.Run()
-		if err != nil {
-			panic(err)
-		}
-	} else if defUrl != "" {
+	} else {
 		cmd := exec.Command("powershell.exe", "/c", "mpv", defUrl)
 		err := cmd.Run()
 		if err != nil {
@@ -217,7 +206,7 @@ func listEpisodes(anime_id string) WatchResponse {
 	return sources
 }
 
-func watch(provider, watchid, episodeNumber, id string) (string, string, string) {
+func watch(provider, watchid, episodeNumber, id string) (string, string) {
 	url := fmt.Sprintf("https://api.anify.tv/sources?providerId=%s&watchId=%s&episodeNumber=%s&id=%s&subType=sub", provider, watchid, episodeNumber, id)
 	res, err := http.Get(url)
 	if err != nil {
@@ -236,8 +225,8 @@ func watch(provider, watchid, episodeNumber, id string) (string, string, string)
 		panic(err)
 	}
 
-	bestQuality, backup, def := qualityCheck(link, "1080p", "720p")
+	bestQuality, def := link.qualityCheck("1080p")
 
-	return bestQuality, backup, def
+	return bestQuality, def
 
 }
