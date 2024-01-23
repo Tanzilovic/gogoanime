@@ -62,20 +62,10 @@ func qualityCheck(link Links, quality, backup string) (string, string, string) {
 
 func main() {
 	var name string
-	switch {
-	case os.Args[1] != "":
-		{
-			name = os.Args[1]
-		}
-	default:
-		{
-			reader := bufio.NewReader(os.Stdin)
-			fmt.Print("Search Anime: ")
-			name, _ = reader.ReadString('\n')
-			name = strings.TrimSpace(name)
-
-		}
-	}
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Search Anime: ")
+	name, _ = reader.ReadString('\n')
+	name = strings.TrimSpace(name)
 
 	anify := fmt.Sprintf("https://api.anify.tv/search/anime/%s", strings.Replace(name, " ", "%20", -1))
 	res, err := http.Get(anify)
