@@ -39,20 +39,45 @@ type Links struct {
 		Url     string `json:"url"`
 		Quality string `json:"quality"`
 	} `json:"sources"`
-	Intro struct {
-		Start int `json:"start"`
-		End   int `json:"end"`
-	} `json:"intro"`
+}
+
+func qualityCheck(link Links, quality, backup string) (string, string, string) {
+	var def string
+	var second string
+	var best string
+	for i := range link.Sources {
+		if link.Sources[i].Quality == quality {
+			best = link.Sources[i].Url
+		}
+		if link.Sources[i].Quality == backup {
+			second = link.Sources[i].Url
+		}
+		if link.Sources[i].Quality == "default" {
+			def = link.Sources[i].Url
+		}
+	}
+
+	return def, best, second
 }
 
 func main() {
 	var name string
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Search Anime: ")
-	name, _ = reader.ReadString('\n')
-	name = strings.TrimSpace(name)
+	switch {
+	case os.Args[1] != "":
+		{
+			name = os.Args[1]
+		}
+	default:
+		{
+			reader := bufio.NewReader(os.Stdin)
+			fmt.Print("Search Anime: ")
+			name, _ = reader.ReadString('\n')
+			name = strings.TrimSpace(name)
 
-	anify := fmt.Sprintf("https://api.anify.tv/search/anime/%s", strings.Replace(name, " ", "%20", 1))
+		}
+	}
+
+	anify := fmt.Sprintf("https://api.anify.tv/search/anime/%s", strings.Replace(name, " ", "%20", -1))
 	res, err := http.Get(anify)
 	if err != nil {
 		panic(err)
@@ -115,20 +140,36 @@ func mpv(id, episode, english_title string, epNumber int) {
 		}
 	}
 
-	var url string
+	var bestUrl string
+	var secondUrl string
+	var defUrl string
 	var title string
 	for i := range sources[gogoAnime].Episodes {
 		if sources[gogoAnime].Episodes[i].Number == epNumber {
-			url = watch(sources[gogoAnime].ProviderID, sources[gogoAnime].Episodes[i].ID, episode, id)
+			bestUrl, secondUrl, defUrl = watch(sources[gogoAnime].ProviderID, sources[gogoAnime].Episodes[i].ID, episode, id)
 			title = sources[gogoAnime].Episodes[i].Title
 			break
 		}
 	}
 
-	cmd := exec.Command("powershell.exe", "/c", "mpv", url)
-	err := cmd.Run()
-	if err != nil {
-		panic(err)
+	if bestUrl != "" {
+		cmd := exec.Command("powershell.exe", "/c", "mpv", bestUrl)
+		err := cmd.Run()
+		if err != nil {
+			panic(err)
+		}
+	} else if secondUrl != "" {
+		cmd := exec.Command("powershell.exe", "/c", "mpv", secondUrl)
+		err := cmd.Run()
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		cmd := exec.Command("powershell.exe", "/c", "mpv", defUrl)
+		err := cmd.Run()
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	var choice string
@@ -186,7 +227,7 @@ func listEpisodes(anime_id string) WatchResponse {
 	return sources
 }
 
-func watch(provider, watchid, episodeNumber, id string) string {
+func watch(provider, watchid, episodeNumber, id string) (string, string, string) {
 	url := fmt.Sprintf("https://api.anify.tv/sources?providerId=%s&watchId=%s&episodeNumber=%s&id=%s&subType=sub", provider, watchid, episodeNumber, id)
 	res, err := http.Get(url)
 	if err != nil {
@@ -205,13 +246,8 @@ func watch(provider, watchid, episodeNumber, id string) string {
 		panic(err)
 	}
 
-	var bestQuality string
+	bestQuality, backup, def := qualityCheck(link, "1080p", "720p")
 
-	for i := range link.Sources {
-		if link.Sources[i].Quality == "1080p" {
-			bestQuality = link.Sources[i].Url
-			break
-		}
-	}
-	return bestQuality
+	return bestQuality, backup, def
+
 }
