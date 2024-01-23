@@ -154,7 +154,7 @@ func mpv(id, episode, english_title string, epNumber int) {
 		if err != nil {
 			panic(err)
 		}
-	} else {
+	} else if defUrl != "" {
 		cmd := exec.Command("powershell.exe", "/c", "mpv", defUrl)
 		err := cmd.Run()
 		if err != nil {
