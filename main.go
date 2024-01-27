@@ -140,13 +140,12 @@ func mpv(id, episode, english_title string, epNumber int) {
 
 	if bestUrl != "" {
 		bestUrl = fmt.Sprintf("'%s'", bestUrl)
-		fmt.Println(bestUrl)
 		cmd := exec.Command("powershell.exe", "/c", "mpv", bestUrl)
 		err := cmd.Run()
 		if err != nil {
 			panic(err)
 		}
-	} else {
+	} else if defUrl != "" {
 		defUrl = fmt.Sprintf("'%s'", defUrl)
 		fmt.Println("Default:", defUrl)
 		cmd := exec.Command("powershell.exe", "/c", "mpv", defUrl)
@@ -154,6 +153,9 @@ func mpv(id, episode, english_title string, epNumber int) {
 		if err != nil {
 			panic(err)
 		}
+	} else {
+		fmt.Println("Unable to find URL for episode :(")
+		os.Exit(1)
 	}
 
 	var choice string
