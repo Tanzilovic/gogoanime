@@ -13,5 +13,4 @@ But a script that lets you watch anime via the command line written in Go.
 
 # Current requirements
 
-- [golang](https://go.dev)
 - [mpv](https://community.chocolatey.org/packages/mpv)
