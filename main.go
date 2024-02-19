@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -140,17 +141,33 @@ func mpv(id, episode, english_title string, epNumber int) {
 
 	if bestUrl != "" {
 		bestUrl = fmt.Sprintf("'%s'", bestUrl)
-		cmd := exec.Command("powershell.exe", "/c", "mpv", bestUrl)
-		err := cmd.Run()
-		if err != nil {
-			panic(err)
+		if runtime.GOOS == "windows" {
+			cmd := exec.Command("powershell.exe", "/c", "mpv", bestUrl)
+			err := cmd.Run()
+			if err != nil {
+				panic(err)
+			}
+		} else if runtime.GOOS == "darwin" {
+			cmd := exec.Command("powershell.exe", "/c", "iina", bestUrl)
+			err := cmd.Run()
+			if err != nil {
+				panic(err)
+			}
 		}
 	} else if defUrl != "" {
 		defUrl = fmt.Sprintf("'%s'", defUrl)
-		cmd := exec.Command("powershell.exe", "/c", "mpv", defUrl)
-		err := cmd.Run()
-		if err != nil {
-			panic(err)
+		if runtime.GOOS == "windows" {
+			cmd := exec.Command("powershell.exe", "/c", "mpv", defUrl)
+			err := cmd.Run()
+			if err != nil {
+				panic(err)
+			}
+		} else if runtime.GOOS == "darwin" {
+			cmd := exec.Command("/bin/sh", "/c", "iina", defUrl)
+			err := cmd.Run()
+			if err != nil {
+				panic(err)
+			}
 		}
 	} else {
 		fmt.Println("Unable to find URL for episode :(")
